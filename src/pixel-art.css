@@ -1,0 +1,67 @@
+/* Preserve the pixel clusters in the original atlases at every display size. */
+.pixel-sprite,.pixel-world-tile,.pixel-hero-scene { image-rendering: pixelated; image-rendering: crisp-edges; }
+@supports (image-rendering: pixelated) { .pixel-sprite,.pixel-world-tile,.pixel-hero-scene { image-rendering: pixelated; } }
+.pixel-portrait { display: block; position: relative; flex-shrink: 0; isolation: isolate; }
+.pixel-sprite { display: block; position: absolute; bottom: 0; left: 0; width: 100%; aspect-ratio: 1; background-repeat: no-repeat; background-size: 400% 400%; }
+.character-art>.pixel-portrait { width: 100%; max-width: 224px; height: 224px; }
+.character-art { height: 224px; background-color: #141624; background-image: linear-gradient(#ffffff03 1px,transparent 1px),linear-gradient(90deg,#ffffff03 1px,transparent 1px),radial-gradient(ellipse at center,color-mix(in srgb,var(--world) 10%,transparent),transparent 75%); background-size: 16px 16px,16px 16px,100% 100%; }
+.character-art:after { content: ''; position: absolute; bottom: 15px; left: 24%; width: 52%; height: 5px; background: color-mix(in srgb,var(--world) 17%,transparent); box-shadow: 0 -3px 0 #ffffff03; z-index: 0; }
+.character-art>.pixel-portrait { z-index: 1; }
+.active-character-tag { z-index: 2; bottom: 8px; }
+.arena-hero>.pixel-portrait { max-width: 275px; margin-inline: auto; }
+.combatant>.pixel-portrait { width: 256px; height: 285px; }
+.enemy-art>.pixel-portrait { width: 100%; height: 100%; }
+.enemy-art { width: 256px; height: 285px; }
+.world-art.pixel-landscape { display: block; position: relative; width: 100%; aspect-ratio: 320/145; height: auto; overflow: hidden; background: #16182a; }
+.pixel-world-tile { display: block; position: absolute; width: 100%; aspect-ratio: 1; left: 0; top: 50%; transform: translateY(-50%); background-repeat: no-repeat; background-size: 400% 400%; }
+.world-card .pixel-landscape:after { content: ''; position: absolute; inset: 60% 0 0; background: linear-gradient(transparent,#181821); pointer-events: none; }
+.hero-banner { border-radius: 5px; border: 1px solid #baa2ed25; box-shadow: inset 0 0 0 3px #ffffff03; }
+.hero-banner:before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg,#11131eed 0%,#11131ed9 27%,#11131e88 49%,#11131e15 72%); pointer-events: none; }
+.hero-content { z-index: 2; }
+.hero-image-caption { z-index: 2; }
+.hero-art.pixel-hero-scene { width: 100%; height: 100%; left: 0; object-fit: cover; object-position: center 55%; opacity: 1; }
+.world-card,.character-card { border-radius: 5px; }
+.world-card-tag,.character-rarity { border-radius: 2px; backdrop-filter: blur(5px); }
+.battle-background { opacity: .6; }
+.battle-background>.pixel-landscape { height: 100%; }
+.battle-background .pixel-world-tile { top: 100%; transform: translateY(-100%); }
+.battle-stage:after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#101422a8,transparent 40%,#10142240 65%,#101422aa); z-index: 0; }
+.battle-stage .battle-topline,.battle-stage .combatants { z-index: 1; }
+.battle-result { z-index: 5; }
+.battle-stage { border-radius: 5px; }
+.combatant .pixel-portrait { filter: drop-shadow(0 5px 0 #0c101b99); }
+.main-hero-loadout>div { display: flex; align-items: flex-end; justify-content: center; height: 200px; overflow: hidden; }
+.main-hero-loadout .pixel-portrait { width: 224px; height: 224px; }
+.support-card>.pixel-portrait { width: 78px; height: 83px; margin-bottom: -8px; }
+.story-illustration .pixel-landscape { height: 100%; width: 100%; }
+.story-illustration>span:not(.pixel-landscape) { display: none; }
+.story-illustration { min-height: 255px; }
+.modal-world-art>.pixel-landscape { height: 100%; }
+.memory-card .pixel-portrait { width: 76px; height: 76px; margin-top: -6px; }
+.memory-card.revealed small { margin-top: -5px; }
+.memory-card.revealed { gap: 0; }
+@media(max-width:1000px) {
+  .character-art { height: 209px; }
+  .character-art>.pixel-portrait { height: 209px; max-width: 209px; }
+  .combatant>.pixel-portrait,.enemy-art { width: 200px; height: 235px; }
+  .story-illustration { min-height: 155px; }
+  .hero-art.pixel-hero-scene { width: 100%; left: 0; }
+}
+@media(max-width:760px) {
+  .combatant>.pixel-portrait,.enemy-art { width: 184px; height: 224px; }
+  .support-card>.pixel-portrait { width: 65px; height: 79px; }
+}
+@media(max-width:480px) {
+  .character-art { height: 174px; }
+  .character-art>.pixel-portrait { height: 174px; max-width: 174px; }
+  .hero-art.pixel-hero-scene { width: 135%; left: -25%; object-position: center 50%; }
+  .hero-banner:before { background: linear-gradient(90deg,#11131ee5 0%,#11131eb3 50%,#11131e60 100%); }
+  .combatant>.pixel-portrait,.enemy-art { width: 140px; height: 190px; }
+  .arena-hero>.pixel-portrait { width: 100%; max-width: 175px; }
+  .support-card>.pixel-portrait { width: 47px; height: 66px; }
+  .main-hero-loadout>div { height: 178px; }
+  .main-hero-loadout .pixel-portrait { width: 192px; height: 192px; }
+  .story-illustration { min-height: 130px; }
+  .memory-card .pixel-portrait { width: 56px; height: 56px; margin: 0; }
+  .memory-card.revealed small { margin-top: 0; font-size:12px; }
+}
