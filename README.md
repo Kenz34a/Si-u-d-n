@@ -2,6 +2,12 @@
 
 Fan game RPG đa vũ trụ anime bằng tiếng Việt, chơi trên trình duyệt máy tính hoặc điện thoại. Các trận chơi đơn với đối thủ máy. Có thể chơi khách hoặc đăng nhập để lưu hành trình theo tài khoản trên máy chủ.
 
+## Bản 1.7 — animation pixel
+
+Anh hùng và đối thủ chuyển động chờ theo bước pixel. Khi chiến đấu, nhân vật lao lên, phản ứng khi trúng đòn, thanh HP/năng lượng chạy theo hành động và số sát thương bay lên. Kỹ năng có hiệu ứng theo anime: tia Ki, Rasengan, kiếm, Kagune, ma pháp, bóng tối, chú thuật, nước và lửa; các anh hùng phụ có biến thể màu và kiểu riêng. Phòng thủ có khiên, hồi phục có hạt sáng xanh, liên kích gọi hình ảnh đồng đội; chiến thắng có hiệu ứng huy chương và pháo giấy pixel. Trên điện thoại, game cuộn đến trận đấu để bạn thấy hiệu ứng.
+
+Giao diện thêm hạt sáng ở cổng đa vũ trụ, chuyển màn hình, mở hộp thoại và phản hồi khi bấm nút. Trong **Cài đặt → Hiệu ứng chuyển động**, có thể tắt animation; game cũng tự tôn trọng tùy chọn giảm chuyển động của thiết bị. Chỉ nhân vật đang nằm trong khung nhìn chạy hoạt ảnh chờ. Hiệu ứng được hủy khi đổi màn hình hoặc chọn lượt mới; cơ chế tính lượt, phần thưởng và bản lưu giữ nguyên.
+
 ## Bản 1.6 — tài khoản và quản trị máy chủ
 
 Máy chủ Node.js + SQLite lưu tài khoản và tiến trình độc lập cho nhiều người chơi. Đăng ký/đăng nhập trong **Tài khoản**, chơi như bình thường rồi mở trên thiết bị khác để tiếp tục. Bản chơi khách được giữ riêng; mục Tài khoản có thao tác nhập bản cục bộ với xác nhận. Trận đấu vẫn chạy theo cơ chế chơi đơn hiện có.

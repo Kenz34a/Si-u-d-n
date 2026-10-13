@@ -5,6 +5,8 @@ import './pixel-art.css';
 import './pixel-ui.css';
 import './pixel-ux.css';
 import './admin.css';
+import './pixel-motion.css';
+import { createPixelMotion } from './pixel-motion.js';
 import { createAccountService } from './account-service.js';
 import { accountPage, adminPage, accountBanner, syncLabel } from './admin-ui.js';
 import { createAdminController } from './admin-controller.js';
@@ -30,6 +32,13 @@ let page = navigation.some(n => n.id === location.hash.slice(1)) ? location.hash
 let modal = null;
 let mobileOpen = false;
 const mobileViewport = window.matchMedia('(max-width: 760px)');
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+const motion = createPixelMotion(() => state.settings.motion && !motionPreference.matches);
+motionPreference.addEventListener('change', () => {
+  motion.cancel();
+  document.body.classList.toggle('reduce-motion', !state.settings.motion || motionPreference.matches);
+  motion.prepare();
+});
 let menuReturnFocus = 'mobile-menu-toggle';
 let rankWorld = 'all';
 let heroFilter = 'all';
@@ -130,6 +139,7 @@ function navigate(next) {
   lastEffect = null;
   render();
   revealPage();
+  motion.enter();
   if (next === 'admin' && account.user?.role === 'admin') admin.refresh().catch(admin.report);
 }
 
@@ -244,26 +254,28 @@ function modalView() {
     const title = operation === 'status' ? target.user.status === 'active' ? 'Khóa tài khoản?' : 'Mở tài khoản?' : operation === 'restore' ? 'Khôi phục bản sao lưu?' : 'Đặt lại tiến trình người chơi?';
     content = `<h2 id="dialog-title">${title}</h2><p>Tài khoản: <strong>${esc(target.user.username)}</strong>. ${operation === 'status' ? 'Khóa tài khoản sẽ kết thúc các phiên đăng nhập của người chơi.' : 'Tiến trình hiện tại được sao lưu trước khi thay đổi. Bản chơi cũ đang mở sẽ phải tải lại bản máy chủ.'}</p><div class="modal-actions">${button('Hủy', 'close-modal', 'outline')}${button('Xác nhận', 'admin-execute', 'danger')}</div>`;
   } else if (modal.type === 'settings') {
-    content = `<span class="eyebrow">CÀI ĐẶT TRÒ CHƠI</span><h2 id="dialog-title">Cài đặt hành trình</h2><div class="setting-row"><div><strong>Âm thanh chiến đấu</strong><p>Hiệu ứng tổng hợp, không dùng nhạc anime.</p></div><button class="toggle ${state.settings.sound ? 'on' : ''}" role="switch" aria-checked="${state.settings.sound}" aria-label="Âm thanh chiến đấu" data-action="toggle-sound"><span></span></button></div><div class="setting-row"><div><strong>Hiệu ứng chuyển động</strong><p>Hoạt ảnh và hiệu ứng sát thương.</p></div><button class="toggle ${state.settings.motion ? 'on' : ''}" role="switch" aria-checked="${state.settings.motion}" aria-label="Hiệu ứng chuyển động" data-action="toggle-motion"><span></span></button></div><div class="setting-row"><div><strong>Tiến trình của bạn</strong><p>Lưu tự động trên trình duyệt này. Có thể tải và khôi phục bản lưu trên thiết bị khác.</p></div></div><div class="save-actions">${button(`${icon('save')} Tải bản lưu`, 'export', 'outline')}<label class="btn outline">${icon('save')} Khôi phục<input type="file" id="import-save" accept="application/json,.json" class="sr-only" /></label></div><p class="save-warning" role="status">Khôi phục sẽ thay tiến trình hiện tại. Hãy tải bản lưu trước.</p><button class="text-button danger-text" data-action="confirm-reset">Xóa tiến trình và chơi lại</button><div class="fan-note">Anime Nexus là fan game độc lập. Tên nhân vật và các thế giới thuộc chủ sở hữu tương ứng. Hình minh họa pixel và cơ chế game được tạo riêng cho dự án.</div>`;
+    content = `<span class="eyebrow">CÀI ĐẶT TRÒ CHƠI</span><h2 id="dialog-title">Cài đặt hành trình</h2><div class="setting-row"><div><strong>Âm thanh chiến đấu</strong><p>Hiệu ứng tổng hợp, không dùng nhạc anime.</p></div><button class="toggle ${state.settings.sound ? 'on' : ''}" role="switch" aria-checked="${state.settings.sound}" aria-label="Âm thanh chiến đấu" data-action="toggle-sound"><span></span></button></div><div class="setting-row"><div><strong>Hiệu ứng chuyển động</strong><p>Chuyển động pixel và hiệu ứng kỹ năng. Tôn trọng cài đặt giảm chuyển động của thiết bị.</p></div><button class="toggle ${state.settings.motion ? 'on' : ''}" role="switch" aria-checked="${state.settings.motion}" aria-label="Hiệu ứng chuyển động" data-action="toggle-motion"><span></span></button></div><div class="setting-row"><div><strong>Tiến trình của bạn</strong><p>Lưu tự động trên trình duyệt này. Có thể tải và khôi phục bản lưu trên thiết bị khác.</p></div></div><div class="save-actions">${button(`${icon('save')} Tải bản lưu`, 'export', 'outline')}<label class="btn outline">${icon('save')} Khôi phục<input type="file" id="import-save" accept="application/json,.json" class="sr-only" /></label></div><p class="save-warning" role="status">Khôi phục sẽ thay tiến trình hiện tại. Hãy tải bản lưu trước.</p><button class="text-button danger-text" data-action="confirm-reset">Xóa tiến trình và chơi lại</button><div class="fan-note">Anime Nexus là fan game độc lập. Tên nhân vật và các thế giới thuộc chủ sở hữu tương ứng. Hình minh họa pixel và cơ chế game được tạo riêng cho dự án.</div>`;
   }
   return `<dialog id="game-dialog" aria-labelledby="dialog-title"><button class="dialog-close" data-action="close-modal" aria-label="Đóng hộp thoại">${icon('close')}</button><div class="dialog-body">${content}</div></dialog>`;
 }
 
 function render() {
+  motion.cancel();
   refreshDaily(state);
   const route = navigation.find(n => n.id === page);
   const char = characterById(state.activeCharacter);
   const questReady = QUESTS.filter(q => questProgress(state, q) === q.target && !state.daily.claimed.includes(q.id)).length;
-  document.body.classList.toggle('reduce-motion', !state.settings.motion);
+  document.body.classList.toggle('reduce-motion', !state.settings.motion || motionPreference.matches);
   document.body.classList.toggle('pixel-drawer-open', mobileOpen);
   document.body.dataset.page = page;
-  app.innerHTML = `<a class="pixel-skip" href="#main-content">Đến nội dung trò chơi</a><div class="app-shell"><aside id="mobile-drawer" class="sidebar ${mobileOpen ? 'mobile-open' : ''}" ${mobileViewport.matches && !mobileOpen ? 'inert' : ''} ${mobileOpen ? 'role="dialog" aria-modal="true" aria-label="Menu Nexus"' : ''}><div class="pixel-drawer-heading"><span>MENU NEXUS</span><button id="mobile-menu-close" class="icon-button" data-action="mobile-menu" aria-label="Đóng menu">${icon('close')}</button></div><a class="brand" href="#overview" data-action="nav" data-page="overview" aria-label="Anime Nexus — Tổng quan"><span class="brand-mark">${icon('nexus')}</span><span>ANIME<span class="brand-second">NEXUS<span class="brand-dot">.</span></span></span></a><div class="sidebar-label">MENU PHIÊU LƯU</div><nav aria-label="Điều hướng chính">${navigation.filter(n => n.id !== 'admin' || account.user?.role === 'admin').map(n => `<button class="nav-item ${page === n.id ? 'active' : ''}" data-action="nav" data-page="${n.id}" ${page === n.id ? 'aria-current="page"' : ''}>${icon(n.icon)}<span>${n.name}</span>${n.id === 'quests' && questReady ? `<span class="nav-badge ready">${questReady}</span>` : n.badge ? `<span class="nav-badge">${n.badge}</span>` : ''}${n.id === 'arena' && state.battle?.status === 'active' ? '<span class="live-dot"></span>' : ''}</button>`).join('')}</nav><div class="sidebar-event"><div class="event-symbol">${icon('nexus')}</div><span class="eyebrow">HÀNH TRÌNH CỦA BẠN</span><h3>Huyền thoại bắt đầu<br>từ bước đầu tiên.</h3><p>Nhận tinh thạch khi hoàn thành nhiệm vụ mỗi ngày.</p><button data-action="nav" data-page="quests">Khám phá nhiệm vụ ${icon('arrow')}</button></div><div class="sidebar-bottom"><button class="nav-item" data-action="settings">${icon('settings')} Cài đặt</button><div class="build-label"><span class="live-dot"></span> Bản fan game · Chơi đơn <small>v1.6.0</small></div></div></aside>${mobileOpen ? '<button class="sidebar-backdrop" data-action="mobile-menu" aria-hidden="true" tabindex="-1"></button>' : ''}<div class="main-shell" ${mobileOpen ? 'inert' : ''}><header class="topbar"><div class="topbar-title"><button id="mobile-menu-toggle" class="icon-button mobile-menu" data-action="mobile-menu" aria-label="Mở menu" aria-controls="mobile-drawer" aria-expanded="${mobileOpen}">${icon('menu')}</button><span class="breadcrumb">Không gian của bạn ${icon('chevron')}</span><strong>${route.name}</strong></div><div class="topbar-right"><div class="currencies">${money(state.gold)}<i></i>${money(state.gems, 'gem')}</div><button class="icon-button sound-button ${state.settings.sound ? 'sound-on' : ''}" data-action="toggle-sound" aria-label="${state.settings.sound ? 'Tắt' : 'Bật'} âm thanh" title="${state.settings.sound ? 'Tắt' : 'Bật'} âm thanh">${icon('sound')}</button><span class="topbar-divider"></span><button class="profile-button" data-action="profile"><span class="profile-avatar" style="--world:${worldById(char.world).color}">${esc(state.name[0].toUpperCase())}</span><span class="profile-details"><strong>${esc(state.name)}</strong><small>Nhà thám hiểm · Lv. ${state.level}</small></span>${icon('chevron')}</button></div></header><main id="main-content" tabindex="-1">${accountBanner(account)}${({ overview, account: () => accountPage(account, accountTab), admin: () => adminPage(account, admin.model), worlds: worldsPage, heroes: heroesPage, arena: arenaPage, quests: questsPage, ranking: rankingPage, shop: shopPage, adventures: () => adventuresPage(state, activityTab, { storyWorld, storyChapter, storyChoice }), loadout: () => loadoutPage(state, gearWorldFilter) })[page]()}</main><footer class="footer"><span>ANIME NEXUS <span>·</span> Hành trình của riêng bạn.</span><span id="server-sync-indicator">${icon('save')} ${storageAvailable ? syncLabel(account) : 'Không thể tự động lưu'}</span></footer></div>${mobileDock(page, mobileOpen, state.battle?.status === 'active')}</div>${modalView()}`;
+  app.innerHTML = `<a class="pixel-skip" href="#main-content">Đến nội dung trò chơi</a><div class="app-shell"><aside id="mobile-drawer" class="sidebar ${mobileOpen ? 'mobile-open' : ''}" ${mobileViewport.matches && !mobileOpen ? 'inert' : ''} ${mobileOpen ? 'role="dialog" aria-modal="true" aria-label="Menu Nexus"' : ''}><div class="pixel-drawer-heading"><span>MENU NEXUS</span><button id="mobile-menu-close" class="icon-button" data-action="mobile-menu" aria-label="Đóng menu">${icon('close')}</button></div><a class="brand" href="#overview" data-action="nav" data-page="overview" aria-label="Anime Nexus — Tổng quan"><span class="brand-mark">${icon('nexus')}</span><span>ANIME<span class="brand-second">NEXUS<span class="brand-dot">.</span></span></span></a><div class="sidebar-label">MENU PHIÊU LƯU</div><nav aria-label="Điều hướng chính">${navigation.filter(n => n.id !== 'admin' || account.user?.role === 'admin').map(n => `<button class="nav-item ${page === n.id ? 'active' : ''}" data-action="nav" data-page="${n.id}" ${page === n.id ? 'aria-current="page"' : ''}>${icon(n.icon)}<span>${n.name}</span>${n.id === 'quests' && questReady ? `<span class="nav-badge ready">${questReady}</span>` : n.badge ? `<span class="nav-badge">${n.badge}</span>` : ''}${n.id === 'arena' && state.battle?.status === 'active' ? '<span class="live-dot"></span>' : ''}</button>`).join('')}</nav><div class="sidebar-event"><div class="event-symbol">${icon('nexus')}</div><span class="eyebrow">HÀNH TRÌNH CỦA BẠN</span><h3>Huyền thoại bắt đầu<br>từ bước đầu tiên.</h3><p>Nhận tinh thạch khi hoàn thành nhiệm vụ mỗi ngày.</p><button data-action="nav" data-page="quests">Khám phá nhiệm vụ ${icon('arrow')}</button></div><div class="sidebar-bottom"><button class="nav-item" data-action="settings">${icon('settings')} Cài đặt</button><div class="build-label"><span class="live-dot"></span> Bản fan game · Chơi đơn <small>v1.7.0</small></div></div></aside>${mobileOpen ? '<button class="sidebar-backdrop" data-action="mobile-menu" aria-hidden="true" tabindex="-1"></button>' : ''}<div class="main-shell" ${mobileOpen ? 'inert' : ''}><header class="topbar"><div class="topbar-title"><button id="mobile-menu-toggle" class="icon-button mobile-menu" data-action="mobile-menu" aria-label="Mở menu" aria-controls="mobile-drawer" aria-expanded="${mobileOpen}">${icon('menu')}</button><span class="breadcrumb">Không gian của bạn ${icon('chevron')}</span><strong>${route.name}</strong></div><div class="topbar-right"><div class="currencies">${money(state.gold)}<i></i>${money(state.gems, 'gem')}</div><button class="icon-button sound-button ${state.settings.sound ? 'sound-on' : ''}" data-action="toggle-sound" aria-label="${state.settings.sound ? 'Tắt' : 'Bật'} âm thanh" title="${state.settings.sound ? 'Tắt' : 'Bật'} âm thanh">${icon('sound')}</button><span class="topbar-divider"></span><button class="profile-button" data-action="profile"><span class="profile-avatar" style="--world:${worldById(char.world).color}">${esc(state.name[0].toUpperCase())}</span><span class="profile-details"><strong>${esc(state.name)}</strong><small>Nhà thám hiểm · Lv. ${state.level}</small></span>${icon('chevron')}</button></div></header><main id="main-content" tabindex="-1">${accountBanner(account)}${({ overview, account: () => accountPage(account, accountTab), admin: () => adminPage(account, admin.model), worlds: worldsPage, heroes: heroesPage, arena: arenaPage, quests: questsPage, ranking: rankingPage, shop: shopPage, adventures: () => adventuresPage(state, activityTab, { storyWorld, storyChapter, storyChoice }), loadout: () => loadoutPage(state, gearWorldFilter) })[page]()}</main><footer class="footer"><span>ANIME NEXUS <span>·</span> Hành trình của riêng bạn.</span><span id="server-sync-indicator">${icon('save')} ${storageAvailable ? syncLabel(account) : 'Không thể tự động lưu'}</span></footer></div>${mobileDock(page, mobileOpen, state.battle?.status === 'active')}</div>${modalView()}`;
   if (modal) {
     const dialog = document.querySelector('#game-dialog');
     dialog.showModal();
     dialog.addEventListener('cancel', event => { event.preventDefault(); closeModal(); });
     dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) closeModal(); } });
   }
+  motion.prepare();
 }
 
 function toggleMobileMenu(triggerId) {
@@ -329,11 +341,14 @@ app.addEventListener('click', event => {
 });
 
 function doBattleAction(action) {
+  const before = state.battle ? structuredClone(state.battle) : null;
   const outcome = battleAction(state, action);
   if (outcome.error) { toast(outcome.error, true); return; }
   lastEffect = outcome;
   sound(outcome.won ? 'win' : 'hit');
   persist(); render();
+  motion.battle({ before, after: state.battle, outcome, action });
+  lastEffect = null;
   document.querySelector(`[data-action="battle-action"][data-id="${action}"]:not(:disabled)`)?.focus({ preventScroll: true });
 }
 
@@ -386,6 +401,7 @@ window.addEventListener('keydown', event => {
 
 persist();
 render();
+motion.enter();
 account.initialize().then(() => { if (page === 'admin' && account.user?.role === 'admin') admin.refresh().catch(admin.report); });
 
 function handleExpansionAction(action, id) {

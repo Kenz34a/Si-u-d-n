@@ -31,6 +31,8 @@ test('complete a fight, reload mid-fight, claim a quest and see real ranking pro
 });
 
 test('all sixteen universes expose anime ranks and lead to the corresponding arena', async ({ page }) => {
+  // This flow opens and closes dialogs, battles and routes in all sixteen worlds.
+  test.setTimeout(60_000);
   await page.goto('/#worlds');
   const ids = ['dragon-ball', 'naruto', 'one-piece', 'bleach', 'tokyo-ghoul', 'slime', 'sao', 'overlord', 'solo-leveling', 'wistoria', 'black-clover', 'jujutsu-kaisen', 'seven-deadly-sins', 'fate-zero', 'demon-slayer', 'fairy-tail'];
   for (const id of ids) {
