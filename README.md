@@ -1,6 +1,26 @@
 # Anime Nexus
 
-Fan game RPG đa vũ trụ anime bằng tiếng Việt, chơi trên trình duyệt máy tính hoặc điện thoại. Đây là bản chơi đơn với đối thủ máy, không cần tài khoản hay khóa API.
+Fan game RPG đa vũ trụ anime bằng tiếng Việt, chơi trên trình duyệt máy tính hoặc điện thoại. Các trận chơi đơn với đối thủ máy. Có thể chơi khách hoặc đăng nhập để lưu hành trình theo tài khoản trên máy chủ.
+
+## Bản 1.6 — tài khoản và quản trị máy chủ
+
+Máy chủ Node.js + SQLite lưu tài khoản và tiến trình độc lập cho nhiều người chơi. Đăng ký/đăng nhập trong **Tài khoản**, chơi như bình thường rồi mở trên thiết bị khác để tiếp tục. Bản chơi khách được giữ riêng; mục Tài khoản có thao tác nhập bản cục bộ với xác nhận. Trận đấu vẫn chạy theo cơ chế chơi đơn hiện có.
+
+**Quản trị** chỉ xuất hiện sau khi đăng nhập tài khoản admin. Admin xem thống kê, tìm và phân trang người chơi, sửa tên/vàng/tinh thạch/bình hồi phục/mảnh, khóa hoặc mở tài khoản, đặt lại mật khẩu, đặt lại tiến trình và khôi phục bản sao lưu. Máy chủ lưu 10 bản trước thao tác admin cho mỗi người chơi và nhật ký quản trị. Khóa tài khoản hoặc đặt lại mật khẩu kết thúc các phiên cũ.
+
+Quyền được kiểm tra tại từng API trên máy chủ. Mật khẩu được băm bằng scrypt; phiên dùng cookie HttpOnly/SameSite, hết hạn sau 12 giờ. Các thay đổi cần token CSRF và đúng origin. Phiên bản bản lưu ngăn bản chơi cũ ghi đè thay đổi mới từ admin hoặc thiết bị khác; giao diện báo xung đột, cho tải bản lưu và chọn bản máy chủ. Không có mật khẩu admin cố định trong mã nguồn.
+
+### Khởi động và đăng nhập admin
+
+Yêu cầu **Node.js 24+**. Chạy `npm ci`, `npm run build`, rồi `npm start`. Máy chủ phục vụ cả game và API trên cổng 3000 (đổi bằng `PORT`). Để phát triển, `npm run dev` chạy Vite và API chung một cổng.
+
+Lần đầu khởi động, máy chủ tạo tài khoản **admin** và mật khẩu ngẫu nhiên tại `.data/admin-bootstrap.txt`. Mở file đó trên máy chủ, đăng nhập ở **Tài khoản**, rồi đổi mật khẩu; file khởi tạo sẽ được xóa sau khi đổi. File này và cơ sở dữ liệu không được đưa lên GitHub.
+
+Có thể sao chép `.env.example` thành `.env` và cấu hình `ANIME_ADMIN_USERNAME`/`ANIME_ADMIN_PASSWORD` **trước lần khởi động đầu tiên**. Để trống mật khẩu để tạo ngẫu nhiên. Cấu hình khởi tạo không đổi mật khẩu của tài khoản đã có trong SQLite. Vite đọc cấu hình phía máy chủ; không dùng biến `VITE_` để chứa mật khẩu.
+
+Dữ liệu nằm tại `.data/nexus.sqlite`, hoặc đường dẫn `ANIME_DATABASE_PATH`. Dùng thư mục/volume bền vững khi chạy máy chủ và sao lưu SQLite cùng các file WAL khi dừng máy chủ. Khi phục vụ qua HTTPS/reverse proxy, đặt `ANIME_APP_ORIGIN` bằng origin công khai và `ANIME_SECURE_COOKIE=true`.
+
+Bản có admin cần chạy máy chủ Node.js; `npm run preview` chỉ xem bản giao diện tĩnh. Kiểm thử trình duyệt dùng SQLite tạm và tài khoản admin riêng cho kiểm thử, không dùng dữ liệu hay mật khẩu thật.
 
 ## Bản 1.5 — UI và UX RPG pixel
 
@@ -67,13 +87,13 @@ Bản lưu 1.0 được nâng cấp tự động, giữ nguyên tài nguyên, an
 - **Cấp bậc anime:** mỗi thế giới có 7 cấp, mở ở 0 / 120 / 350 / 700 / 1.200 / 2.000 / 3.200 điểm. Điểm từng thế giới độc lập; bảng tổng cộng điểm tất cả thế giới.
 - **Nhiệm vụ ngày, nâng cấp anh hùng, cửa hàng và lịch sử trận đấu.** Nâng cấp áp dụng từ trận tiếp theo; mỗi trận hồi đầy sinh lực.
 - **Tự động lưu** bằng localStorage, kể cả trận đang diễn ra. Cài đặt hỗ trợ xuất/khôi phục JSON, âm thanh, giảm chuyển động và xóa tiến trình có xác nhận.
-- **Bảng xếp hạng mô phỏng:** các NPC có điểm mẫu cố định, điểm người chơi được tính từ trận thật. Không có máy chủ hay PvP trực tuyến.
+- **Bảng xếp hạng mô phỏng:** các NPC có điểm mẫu cố định, điểm người chơi được tính từ trận thật. BXH vẫn mô phỏng cho chế độ chơi đơn; tài khoản và quản trị được lưu thật trên máy chủ. Chưa có PvP trực tuyến.
 
 Phím tắt trong trận: **1** tấn công, **2** kỹ năng, **3** phòng thủ, **4** tuyệt kỹ, **5** liên kích khi có đội hỗ trợ, **H** hồi phục. Tuyệt kỹ cần 100 năng lượng; kỹ năng cần 35 năng lượng và hồi sau 2 lượt. Hồi phục sử dụng một lượt, đối thủ vẫn tấn công.
 
 ## Chạy dự án
 
-Yêu cầu Node.js **22.12+** hoặc **24+**, npm. Trong Codex cloud, dùng checkout có sẵn ở `/workspace/Si-u-d-n`; mỗi task đã được cô lập, không cần tạo Git worktree.
+Yêu cầu Node.js **24+**, npm. Trong Codex cloud, dùng checkout có sẵn ở `/workspace/Si-u-d-n`; mỗi task đã được cô lập, không cần tạo Git worktree.
 
 ```bash
 cd /workspace/Si-u-d-n

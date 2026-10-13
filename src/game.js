@@ -28,7 +28,7 @@ export function refreshDaily(state) {
   return state;
 }
 
-export function parseSave(text) {
+export function parseSave(text, { refreshDay = true } = {}) {
   try {
     const raw = JSON.parse(text);
     if (!raw || raw.version !== 1) return null;
@@ -50,7 +50,7 @@ export function parseSave(text) {
     if (['tower', 'rush'].includes(raw.battle?.mode) && raw.battle.status === 'active' && (!raw.adventure[raw.battle.mode].run || raw.adventure[raw.battle.mode].run.stage !== raw.battle.stage)) return null;
     raw.name = typeof raw.name === 'string' && raw.name.trim() ? raw.name.slice(0, 24) : 'Lữ khách';
     raw.settings = { sound: raw.settings?.sound === true, motion: raw.settings?.motion !== false };
-    return refreshDaily(raw);
+    return refreshDay ? refreshDaily(raw) : raw;
   } catch { return null; }
 }
 
